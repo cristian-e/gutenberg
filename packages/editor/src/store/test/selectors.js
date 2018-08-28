@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { filter, without } from 'lodash';
+import { filter, without, fromPairs, map } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -1022,22 +1022,31 @@ describe( 'selectors', () => {
 			const state = {
 				editor: {
 					present: {
-						blocksByClientId: {},
-						blockOrder: {},
-						edits: {
-							content: 'foo',
+						blocksByClientId: {
+							123: {
+								clientId: 123,
+								name: 'core/test-block-a',
+								attributes: {
+									text: 'foo',
+								},
+								isValid: true,
+							},
 						},
+						blockOrder: {
+							'': [ 123 ],
+						},
+						edits: {},
 					},
 				},
 				currentPost: {
 					title: 'foo',
-					content: 'foo',
+					content: '<!-- wp:test-block-a -->\nfoo\n<!-- /wp:test-block-a -->',
 					excerpt: 'foo',
 				},
 				saving: {},
 				autosave: {
 					title: 'foo',
-					content: 'foo',
+					content: '<!-- wp:test-block-a -->\nfoo\n<!-- /wp:test-block-a -->',
 					excerpt: 'foo',
 				},
 			};
@@ -1046,32 +1055,48 @@ describe( 'selectors', () => {
 		} );
 
 		it( 'should return true if title, excerpt, or content have changed', () => {
+			const CONSTANT_FIELD_VALUES = {
+				title: 'foo',
+				excerpt: 'foo',
+				content: '<!-- wp:test-block-a -->\nfoo\n<!-- /wp:test-block-a -->',
+			};
+
 			for ( const variantField of [ 'title', 'excerpt', 'content' ] ) {
-				for ( const constantField of without( [ 'title', 'excerpt', 'content' ], variantField ) ) {
-					const state = {
-						editor: {
-							present: {
-								blocksByClientId: {},
-								blockOrder: {},
-								edits: {
-									content: 'foo',
+				const state = {
+					editor: {
+						present: {
+							blocksByClientId: {
+								123: {
+									clientId: 123,
+									name: 'core/test-block-a',
+									attributes: {
+										text: 'foo',
+									},
+									isValid: true,
 								},
 							},
+							blockOrder: {
+								'': [ 123 ],
+							},
+							edits: {},
 						},
-						currentPost: {
-							title: 'foo',
-							content: 'foo',
-							excerpt: 'foo',
-						},
-						saving: {},
-						autosave: {
-							[ constantField ]: 'foo',
-							[ variantField ]: 'bar',
-						},
-					};
+					},
+					currentPost: {
+						title: 'foo',
+						content: 'foo',
+						excerpt: 'foo',
+					},
+					saving: {},
+					autosave: {
+						...fromPairs( map(
+							without( [ 'title', 'excerpt', 'content' ], variantField ),
+							( key ) => [ key, CONSTANT_FIELD_VALUES[ key ] ],
+						) ),
+						[ variantField ]: '__DIFFERENT__',
+					},
+				};
 
-					expect( isEditedPostAutosaveable( state ) ).toBe( true );
-				}
+				expect( isEditedPostAutosaveable( state ) ).toBe( true );
 			}
 		} );
 	} );
@@ -1142,7 +1167,7 @@ describe( 'selectors', () => {
 						blocksByClientId: {
 							123: {
 								clientId: 123,
-								name: 'core/test-block',
+								name: 'core/test-block-a',
 								attributes: {
 									text: '',
 								},
@@ -1175,23 +1200,6 @@ describe( 'selectors', () => {
 			};
 
 			expect( isEditedPostEmpty( state ) ).toBe( true );
-		} );
-
-		it( 'should return false if edits include a non-empty content property', () => {
-			const state = {
-				editor: {
-					present: {
-						blocksByClientId: {},
-						blockOrder: {},
-						edits: {
-							content: 'sassel',
-						},
-					},
-				},
-				currentPost: {},
-			};
-
-			expect( isEditedPostEmpty( state ) ).toBe( false );
 		} );
 	} );
 

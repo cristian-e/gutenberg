@@ -1358,11 +1358,6 @@ export function getSuggestedPostFormat( state ) {
  */
 export const getEditedPostContent = createSelector(
 	( state ) => {
-		const edits = getPostEdits( state );
-		if ( 'content' in edits ) {
-			return edits.content;
-		}
-
 		const blocks = getBlocks( state );
 
 		if ( blocks.length === 1 && blocks[ 0 ].name === getUnknownTypeHandlerName() ) {
@@ -1371,10 +1366,7 @@ export const getEditedPostContent = createSelector(
 
 		return serialize( blocks );
 	},
-	( state ) => [
-		...getBlocks.getDependants( state ),
-		state.editor.present.edits.content,
-	],
+	( state ) => getBlocks.getDependants( state )
 );
 
 /**
