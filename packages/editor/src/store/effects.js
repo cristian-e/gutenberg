@@ -7,22 +7,18 @@ import { last } from 'lodash';
  * WordPress dependencies
  */
 import {
-	parse,
 	getBlockType,
 	switchToBlockType,
 	doBlocksMatchTemplate,
 	synchronizeBlocksWithTemplate,
 } from '@wordpress/blocks';
-import { __ } from '@wordpress/i18n';
 import { speak } from '@wordpress/a11y';
 
 /**
  * Internal dependencies
  */
 import {
-	setupEditorState,
 	replaceBlocks,
-	createWarningNotice,
 	selectBlock,
 	resetBlocks,
 	setTemplateValidity,
@@ -35,6 +31,7 @@ import {
 	getSelectedBlock,
 	getTemplate,
 	getTemplateLock,
+	isValidTemplate,
 } from './selectors';
 import {
 	fetchReusableBlocks,
@@ -51,7 +48,6 @@ import {
 	trashPost,
 	trashPostFailure,
 	refreshPost,
-	AUTOSAVE_POST_NOTICE_ID,
 } from './effects/posts';
 
 export default {
@@ -113,61 +109,34 @@ export default {
 			]
 		) );
 	},
-	SETUP_EDITOR( action, { getState } ) {
-		const { post, autosave } = action;
-		const state = getState();
-		const template = getTemplate( state );
-		const templateLock = getTemplateLock( state );
-		const isNewPost = post.status === 'auto-draft';
+	RESET_BLOCKS: [
+		function validateBlocksToTemplate( action, store ) {
+			const state = store.getState();
+			const template = getTemplate( state );
+			const templateLock = getTemplateLock( state );
 
-		// Parse content as blocks
-		let blocks = parse( post.content.raw );
-		let isValidTemplate = true;
-		if ( isNewPost && template ) {
-			// Apply a template for new posts only, if exists.
-			blocks = synchronizeBlocksWithTemplate( blocks, template );
-		} else {
-			// Unlocked templates are considered always valid because they act as default values only.
-			isValidTemplate = (
+			// Unlocked templates are considered always valid because they act
+			// as default values only.
+			const isBlocksValidToTemplate = (
 				! template ||
 				templateLock !== 'all' ||
-				doBlocksMatchTemplate( blocks, template )
+				doBlocksMatchTemplate( getBlocks(), template )
 			);
-		}
 
-		// Include auto draft title in edits while not flagging post as dirty
-		const edits = {};
-		if ( isNewPost ) {
-			edits.title = post.title.raw;
-		}
-
-		// Check the auto-save status
-		let autosaveAction;
-		if ( autosave ) {
-			const noticeMessage = __( 'There is an autosave of this post that is more recent than the version below.' );
-			autosaveAction = createWarningNotice(
-				<p>
-					{ noticeMessage }
-					{ ' ' }
-					<a href={ autosave.editLink }>{ __( 'View the autosave' ) }</a>
-				</p>,
-				{
-					id: AUTOSAVE_POST_NOTICE_ID,
-					spokenMessage: noticeMessage,
-				}
-			);
-		}
-
-		return [
-			setTemplateValidity( isValidTemplate ),
-			setupEditorState( post, blocks, edits ),
-			...( autosaveAction ? [ autosaveAction ] : [] ),
-		];
-	},
+			// Update if validity has changed.
+			if ( isBlocksValidToTemplate !== isValidTemplate( state ) ) {
+				return setTemplateValidity( isBlocksValidToTemplate );
+			}
+		},
+	],
 	SYNCHRONIZE_TEMPLATE( action, { getState } ) {
 		const state = getState();
-		const blocks = getBlocks( state );
 		const template = getTemplate( state );
+		if ( ! template ) {
+			return;
+		}
+
+		const blocks = getBlocks( state );
 		const updatedBlockList = synchronizeBlocksWithTemplate( blocks, template );
 
 		return [

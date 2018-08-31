@@ -17,12 +17,10 @@ import {
  * Internal dependencies
  */
 import {
-	setupEditorState,
 	mergeBlocks,
 	replaceBlocks,
 	selectBlock,
 	createErrorNotice,
-	setTemplateValidity,
 	editPost,
 } from '../actions';
 import effects from '../effects';
@@ -413,96 +411,6 @@ describe( 'effects', () => {
 
 			expect( dispatch ).toHaveBeenCalledTimes( 1 );
 			expect( dispatch ).toHaveBeenCalledWith( createErrorNotice( 'Updating failed', { id: 'SAVE_POST_NOTICE_ID' } ) );
-		} );
-	} );
-
-	describe( '.SETUP_EDITOR', () => {
-		const handler = effects.SETUP_EDITOR;
-
-		afterEach( () => {
-			getBlockTypes().forEach( ( block ) => {
-				unregisterBlockType( block.name );
-			} );
-		} );
-
-		it( 'should return post reset action', () => {
-			const post = {
-				id: 1,
-				title: {
-					raw: 'A History of Pork',
-				},
-				content: {
-					raw: '',
-				},
-				status: 'draft',
-			};
-			const getState = () => ( {
-				settings: {
-					template: null,
-					templateLock: false,
-				},
-			} );
-
-			const result = handler( { post, settings: {} }, { getState } );
-
-			expect( result ).toEqual( [
-				setTemplateValidity( true ),
-				setupEditorState( post, [], {} ),
-			] );
-		} );
-
-		it( 'should return block reset with non-empty content', () => {
-			registerBlockType( 'core/test-block', defaultBlockSettings );
-			const post = {
-				id: 1,
-				title: {
-					raw: 'A History of Pork',
-				},
-				content: {
-					raw: '<!-- wp:core/test-block -->Saved<!-- /wp:core/test-block -->',
-				},
-				status: 'draft',
-			};
-			const getState = () => ( {
-				settings: {
-					template: null,
-					templateLock: false,
-				},
-			} );
-
-			const result = handler( { post }, { getState } );
-
-			expect( result[ 1 ].blocks ).toHaveLength( 1 );
-			expect( result ).toEqual( [
-				setTemplateValidity( true ),
-				setupEditorState( post, result[ 1 ].blocks, {} ),
-			] );
-		} );
-
-		it( 'should return post setup action only if auto-draft', () => {
-			const post = {
-				id: 1,
-				title: {
-					raw: 'A History of Pork',
-				},
-				content: {
-					raw: '',
-				},
-				status: 'auto-draft',
-			};
-			const getState = () => ( {
-				settings: {
-					template: null,
-					templateLock: false,
-				},
-			} );
-
-			const result = handler( { post }, { getState } );
-
-			expect( result ).toEqual( [
-				setTemplateValidity( true ),
-				setupEditorState( post, [], { title: 'A History of Pork' } ),
-			] );
 		} );
 	} );
 } );
