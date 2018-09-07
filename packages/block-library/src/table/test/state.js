@@ -13,6 +13,7 @@ import {
 	deleteRow,
 	insertColumn,
 	deleteColumn,
+	getTableStyles,
 } from '../state';
 
 const table = deepFreeze( {
@@ -284,5 +285,39 @@ describe( 'deleteColumn', () => {
 		};
 
 		expect( state ).toEqual( expected );
+	} );
+
+	describe( 'getTableStyles', () => {
+		it( 'returns an empty object if the height and width attributes are undefined', () => {
+			const attributes = {};
+			expect( getTableStyles( attributes ) ).toEqual( {} );
+		} );
+
+		it( 'returns a width value by concatenating the width and widthUnit attributes', () => {
+			const attributes = {
+				width: 52,
+				widthUnit: 'anythings',
+			};
+			expect( getTableStyles( attributes ).width ).toBe( '52anythings' );
+		} );
+
+		it( 'returns a height style by appending px to the end of the height attribute', () => {
+			const attributes = {
+				height: 40,
+			};
+			expect( getTableStyles( attributes ).height ).toBe( '40px' );
+		} );
+
+		it( 'returns a height or width of zero if the attributes are negative', () => {
+			const attributes = {
+				width: -20,
+				widthUnit: 'px',
+				height: -10,
+			};
+			expect( getTableStyles( attributes ) ).toEqual( {
+				width: '0px',
+				height: '0px',
+			} );
+		} );
 	} );
 } );

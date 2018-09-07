@@ -28,6 +28,7 @@ import {
 	deleteRow,
 	insertColumn,
 	deleteColumn,
+	getTableStyles,
 } from './state';
 
 export default class TableEdit extends Component {
@@ -36,6 +37,7 @@ export default class TableEdit extends Component {
 
 		this.onCreateTable = this.onCreateTable.bind( this );
 		this.onChangeFixedLayout = this.onChangeFixedLayout.bind( this );
+		this.onChangeWidth = this.onChangeWidth.bind( this );
 		this.onChange = this.onChange.bind( this );
 		this.onChangeInitialColumnCount = this.onChangeInitialColumnCount.bind( this );
 		this.onChangeInitialRowCount = this.onChangeInitialRowCount.bind( this );
@@ -99,6 +101,15 @@ export default class TableEdit extends Component {
 		const { hasFixedLayout } = attributes;
 
 		setAttributes( { hasFixedLayout: ! hasFixedLayout } );
+	}
+
+	/**
+	 * Update the width of the table
+	 *
+	 * @param {number} width The new width of the table.
+	 */
+	onChangeWidth( width ) {
+		this.props.setAttributes( { width: parseInt( width, 10 ) } );
 	}
 
 	/**
@@ -358,7 +369,7 @@ export default class TableEdit extends Component {
 	render() {
 		const { attributes, className } = this.props;
 		const { initialRowCount, initialColumnCount } = this.state;
-		const { hasFixedLayout, head, body, foot } = attributes;
+		const { hasFixedLayout, head, body, foot, width } = attributes;
 		const isEmpty = ! head.length && ! body.length && ! foot.length;
 		const Section = this.renderSection;
 
@@ -401,6 +412,14 @@ export default class TableEdit extends Component {
 				</BlockControls>
 				<InspectorControls>
 					<PanelBody title={ __( 'Table Settings' ) } className="blocks-table-settings">
+						<TextControl
+							type="number"
+							className="block-library-table__dimensions__width"
+							label={ __( 'Width' ) }
+							value={ width !== undefined ? width : '' }
+							min={ 1 }
+							onChange={ this.onChangeWidth }
+						/>
 						<ToggleControl
 							label={ __( 'Fixed width table cells' ) }
 							checked={ !! hasFixedLayout }
@@ -408,7 +427,7 @@ export default class TableEdit extends Component {
 						/>
 					</PanelBody>
 				</InspectorControls>
-				<table className={ classes }>
+				<table className={ classes } style={ getTableStyles( attributes ) }>
 					<Section type="head" rows={ head } />
 					<Section type="body" rows={ body } />
 					<Section type="foot" rows={ foot } />

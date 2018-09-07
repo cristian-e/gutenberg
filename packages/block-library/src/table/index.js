@@ -14,6 +14,7 @@ import { RichText } from '@wordpress/editor';
  * Internal dependencies
  */
 import edit from './edit';
+import { getTableStyles } from './state';
 
 const tableContentPasteSchema = {
 	tr: {
@@ -86,6 +87,17 @@ export const settings = {
 			type: 'boolean',
 			default: false,
 		},
+		width: {
+			type: 'number',
+			default: 100,
+		},
+		widthUnit: {
+			type: 'string',
+			default: '%',
+		},
+		height: {
+			type: 'number',
+		},
 		head: getTableSectionAttributeSchema( 'head' ),
 		body: getTableSectionAttributeSchema( 'body' ),
 		foot: getTableSectionAttributeSchema( 'foot' ),
@@ -140,7 +152,7 @@ export const settings = {
 		};
 
 		return (
-			<table className={ classes }>
+			<table className={ classes } style={ getTableStyles( attributes ) }>
 				<Section type="head" rows={ head } />
 				<Section type="body" rows={ body } />
 				<Section type="foot" rows={ foot } />
