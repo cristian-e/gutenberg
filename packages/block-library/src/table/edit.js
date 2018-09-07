@@ -38,6 +38,7 @@ export default class TableEdit extends Component {
 		this.onCreateTable = this.onCreateTable.bind( this );
 		this.onChangeFixedLayout = this.onChangeFixedLayout.bind( this );
 		this.onChangeWidth = this.onChangeWidth.bind( this );
+		this.onChangeHeight = this.onChangeHeight.bind( this );
 		this.onChange = this.onChange.bind( this );
 		this.onChangeInitialColumnCount = this.onChangeInitialColumnCount.bind( this );
 		this.onChangeInitialRowCount = this.onChangeInitialRowCount.bind( this );
@@ -106,10 +107,21 @@ export default class TableEdit extends Component {
 	/**
 	 * Update the width of the table
 	 *
-	 * @param {number} width The new width of the table.
+	 * @param {number} updatedWidth The new width of the table.
 	 */
-	onChangeWidth( width ) {
-		this.props.setAttributes( { width: parseInt( width, 10 ) } );
+	onChangeWidth( updatedWidth ) {
+		const width = updatedWidth !== '' ? parseInt( updatedWidth, 10 ) : undefined;
+		this.props.setAttributes( { width } );
+	}
+
+	/**
+	 * Update the height of the table
+	 *
+	 * @param {number} updatedHeight The new height of the table.
+	 */
+	onChangeHeight( updatedHeight ) {
+		const height = updatedHeight !== '' ? parseInt( updatedHeight, 10 ) : undefined;
+		this.props.setAttributes( { height } );
 	}
 
 	/**
@@ -369,7 +381,7 @@ export default class TableEdit extends Component {
 	render() {
 		const { attributes, className } = this.props;
 		const { initialRowCount, initialColumnCount } = this.state;
-		const { hasFixedLayout, head, body, foot, width } = attributes;
+		const { hasFixedLayout, head, body, foot, width, height } = attributes;
 		const isEmpty = ! head.length && ! body.length && ! foot.length;
 		const Section = this.renderSection;
 
@@ -419,6 +431,14 @@ export default class TableEdit extends Component {
 							value={ width !== undefined ? width : '' }
 							min={ 1 }
 							onChange={ this.onChangeWidth }
+						/>
+						<TextControl
+							type="number"
+							className="block-library-table__dimensions__height"
+							label={ __( 'Height' ) }
+							value={ height !== undefined ? height : '' }
+							min={ 1 }
+							onChange={ this.onChangeHeight }
 						/>
 						<ToggleControl
 							label={ __( 'Fixed width table cells' ) }
