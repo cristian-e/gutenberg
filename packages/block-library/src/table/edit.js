@@ -13,6 +13,7 @@ import {
 	PanelBody,
 	ToggleControl,
 	TextControl,
+	SelectControl,
 	Button,
 	Toolbar,
 	DropdownMenu,
@@ -38,6 +39,7 @@ export default class TableEdit extends Component {
 		this.onCreateTable = this.onCreateTable.bind( this );
 		this.onChangeFixedLayout = this.onChangeFixedLayout.bind( this );
 		this.onChangeWidth = this.onChangeWidth.bind( this );
+		this.onChangeWidthUnit = this.onChangeWidthUnit.bind( this );
 		this.onChangeHeight = this.onChangeHeight.bind( this );
 		this.onChange = this.onChange.bind( this );
 		this.onChangeInitialColumnCount = this.onChangeInitialColumnCount.bind( this );
@@ -105,7 +107,7 @@ export default class TableEdit extends Component {
 	}
 
 	/**
-	 * Update the width of the table
+	 * Update the width of the table.
 	 *
 	 * @param {number} updatedWidth The new width of the table.
 	 */
@@ -115,7 +117,16 @@ export default class TableEdit extends Component {
 	}
 
 	/**
-	 * Update the height of the table
+	 * Update the width unit.
+	 *
+	 * @param {number} widthUnit The new width unit (px / %).
+	 */
+	onChangeWidthUnit( widthUnit ) {
+		this.props.setAttributes( { widthUnit } );
+	}
+
+	/**
+	 * Update the height of the table.
 	 *
 	 * @param {number} updatedHeight The new height of the table.
 	 */
@@ -381,7 +392,7 @@ export default class TableEdit extends Component {
 	render() {
 		const { attributes, className } = this.props;
 		const { initialRowCount, initialColumnCount } = this.state;
-		const { hasFixedLayout, head, body, foot, width, height } = attributes;
+		const { hasFixedLayout, head, body, foot, width, widthUnit, height } = attributes;
 		const isEmpty = ! head.length && ! body.length && ! foot.length;
 		const Section = this.renderSection;
 
@@ -424,14 +435,31 @@ export default class TableEdit extends Component {
 				</BlockControls>
 				<InspectorControls>
 					<PanelBody title={ __( 'Table Settings' ) } className="blocks-table-settings">
-						<TextControl
-							type="number"
-							className="block-library-table__dimensions__width"
-							label={ __( 'Width' ) }
-							value={ width !== undefined ? width : '' }
-							min={ 1 }
-							onChange={ this.onChangeWidth }
-						/>
+						<div className="block-library-table__dimensions__row">
+							<TextControl
+								type="number"
+								className="block-library-table__dimensions__width"
+								label={ __( 'Width' ) }
+								value={ width !== undefined ? width : '' }
+								min={ 1 }
+								onChange={ this.onChangeWidth }
+							/>
+							<SelectControl
+								label={ __( 'Width Unit' ) }
+								options={ [
+									{
+										value: '%',
+										label: '%',
+									},
+									{
+										value: 'px',
+										label: 'px',
+									},
+								] }
+								value={ widthUnit }
+								onChange={ this.onChangeWidthUnit }
+							/>
+						</div>
 						<TextControl
 							type="number"
 							className="block-library-table__dimensions__height"
