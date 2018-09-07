@@ -22,6 +22,10 @@
 	}
 }
 
+.block-library-table__overflow_container {
+	overflow: auto;
+}
+
 .block-library-table__dimensions__row {
 	display: flex;
 }

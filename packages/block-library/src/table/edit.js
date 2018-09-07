@@ -475,11 +475,13 @@ export default class TableEdit extends Component {
 						/>
 					</PanelBody>
 				</InspectorControls>
-				<table className={ classes } style={ getTableStyles( attributes ) }>
-					<Section type="head" rows={ head } />
-					<Section type="body" rows={ body } />
-					<Section type="foot" rows={ foot } />
-				</table>
+				<div className="block-library-table__overflow_container">
+					<table className={ classes } style={ getTableStyles( attributes ) }>
+						<Section type="head" rows={ head } />
+						<Section type="body" rows={ body } />
+						<Section type="foot" rows={ foot } />
+					</table>
+				</div>
 			</Fragment>
 		);
 	}
