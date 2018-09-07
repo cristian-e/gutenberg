@@ -21,3 +21,13 @@
 		padding: 0.5em;
 	}
 }
+
+.block-library-table__dimensions__row {
+	display: flex;
+}
+
+.block-library-table__dimensions__width {
+	flex: 1;
+	padding-right: 5px;
+}
+
