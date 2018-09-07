@@ -1,4 +1,10 @@
 .wp-block-table {
+	thead,
+	tbody,
+	tfoot {
+		height: inherit;
+	}
+
 	// Fixed layout toggle
 	&.has-fixed-layout thead,
 	&.has-fixed-layout tbody,
