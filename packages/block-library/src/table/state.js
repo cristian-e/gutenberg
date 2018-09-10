@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { times, isNumber, isEmpty } from 'lodash';
+import { times } from 'lodash';
 
 /**
  * Creates a table state.
@@ -159,52 +159,54 @@ export function deleteColumn( state, {
 }
 
 /**
- * Get the styles for the table's width.
+ * Get the integer value of a style property
  *
- * @param {number} attributes.width     The width of the table.
- * @param {string} attributes.widthUnit The unit used for the width of the table (px, %).
+ * @param {string} rawValue The style's raw value (e.g. 100%, 25px)
  *
- * @return {Object} Style properties for the table's width.
+ * @return {?number} The integer value (e.g. 100, 25)
  */
-export function getWidthStyle( { width, widthUnit } ) {
-	if ( ! isNumber( width ) ) {
+export function getStyleValue( rawValue ) {
+	const parsedValue = parseInt( rawValue, 10 );
+
+	if ( isNaN( parsedValue ) ) {
 		return;
 	}
 
-	return { width: `${ Math.max( width, 0 ) }${ widthUnit }` };
+	return parsedValue;
 }
 
 /**
- * Get the styles for the table's height.
+ * Get the px or % unit from a style value
  *
- * @param {number} attributes.height The height of the table.
+ * @param {string} value The style's value (e.g. 100px, 25%)
  *
- * @return {Object} Style properties for the table's height.
+ * @return {?string} The unit (e.g. px, %)
  */
-export function getHeightStyle( { height } ) {
-	if ( ! isNumber( height ) ) {
+export function getStyleUnit( value ) {
+	const match = /(px|%)/i.exec( value );
+
+	if ( ! match ) {
 		return;
 	}
 
-	return { height: `${ Math.max( height, 0 ) }px` };
+	return match[ 1 ].toLowerCase();
 }
 
 /**
- * Get the styles for the table.
+ * Given the table block attributes, return the style properties
  *
- * @param {number} attributes The attributes for the table block
+ * @param {string} attributes.width  The width value
+ * @param {string} attributes.height The height value
  *
- * @return {Object} Style properties for the table.
+ * @return {?Object} The style properties
  */
-export function getTableStyles( attributes ) {
-	const styles = {
-		...getWidthStyle( attributes ),
-		...getHeightStyle( attributes ),
+export function getTableStyles( { width, height } ) {
+	if ( ! width && ! height ) {
+		return;
+	}
+
+	return {
+		width: width ? width : undefined,
+		height: height ? height : undefined,
 	};
-
-	if ( isEmpty( styles ) ) {
-		return;
-	}
-
-	return styles;
 }

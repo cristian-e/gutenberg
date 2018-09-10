@@ -30,6 +30,8 @@ import {
 	insertColumn,
 	deleteColumn,
 	getTableStyles,
+	getStyleValue,
+	getStyleUnit,
 } from './state';
 
 export default class TableEdit extends Component {
@@ -38,6 +40,7 @@ export default class TableEdit extends Component {
 
 		this.onCreateTable = this.onCreateTable.bind( this );
 		this.onChangeFixedLayout = this.onChangeFixedLayout.bind( this );
+		this.setWidth = this.setWidth.bind( this );
 		this.onChangeWidth = this.onChangeWidth.bind( this );
 		this.onChangeWidthUnit = this.onChangeWidthUnit.bind( this );
 		this.onChangeHeight = this.onChangeHeight.bind( this );
@@ -59,6 +62,7 @@ export default class TableEdit extends Component {
 			initialRowCount: 2,
 			initialColumnCount: 2,
 			selectedCell: null,
+			widthUnit: getStyleUnit( this.props.attributes.width ) || '%',
 		};
 	}
 
@@ -107,42 +111,52 @@ export default class TableEdit extends Component {
 	}
 
 	/**
-	 * Update the width of the table.
+	 * Set the width attribute of the table.
 	 *
-	 * @param {number} width The new width of the table.
+	 * @param {string|number} rawWidth The width of the table.
+	 * @param {string} widthUnit       The width unit to use (e.g. px, %).
 	 */
-	onChangeWidth( width ) {
-		const attributesUpdate = {
-			width: width !== '' ? parseInt( width, 10 ) : undefined,
-		};
-
-		// Guard against the possibility of the width being set with an undefined widthUnit.
-		// This can happen if the user added a deprecated table block from before the width
-		// and widthUnit attributes were introduced.
-		if ( ! this.props.attributes.widthUnit ) {
-			attributesUpdate.widthUnit = '%';
+	setWidth( rawWidth, widthUnit ) {
+		const width = getStyleValue( rawWidth );
+		if ( ! width ) {
+			this.props.setAttributes( { width: undefined } );
+		} else {
+			this.props.setAttributes( { width: `${ width }${ widthUnit }` } );
 		}
-
-		this.props.setAttributes( attributesUpdate );
 	}
 
 	/**
-	 * Update the width unit.
+	 * Handle a change of the width of the table.
 	 *
-	 * @param {number} widthUnit The new width unit (px / %).
+	 * @param {string} width     The new width of the table.
+	 * @param {string} widthUnit The width unit to use (e.g. px, %).
+	 */
+	onChangeWidth( width ) {
+		this.setWidth( width, this.state.widthUnit );
+	}
+
+	/**
+	 * Handle a change of the width unit.
+	 *
+	 * @param {string} widthUnit The new width unit (e.g. px, %).
 	 */
 	onChangeWidthUnit( widthUnit ) {
-		this.props.setAttributes( { widthUnit } );
+		this.setState( { widthUnit } );
+		this.setWidth( this.props.attributes.width, widthUnit );
 	}
 
 	/**
 	 * Update the height of the table.
 	 *
-	 * @param {number} updatedHeight The new height of the table.
+	 * @param {string} rawHeight The new height of the table.
 	 */
-	onChangeHeight( updatedHeight ) {
-		const height = updatedHeight !== '' ? parseInt( updatedHeight, 10 ) : undefined;
-		this.props.setAttributes( { height } );
+	onChangeHeight( rawHeight ) {
+		const height = getStyleValue( rawHeight );
+		if ( height === undefined ) {
+			this.props.setAttributes( { height: undefined } );
+		} else {
+			this.props.setAttributes( { height: `${ height }px` } );
+		}
 	}
 
 	/**
@@ -401,8 +415,8 @@ export default class TableEdit extends Component {
 
 	render() {
 		const { attributes, className } = this.props;
-		const { initialRowCount, initialColumnCount } = this.state;
-		const { hasFixedLayout, head, body, foot, width, widthUnit, height } = attributes;
+		const { initialRowCount, initialColumnCount, widthUnit } = this.state;
+		const { hasFixedLayout, head, body, foot, width, height } = attributes;
 		const isEmpty = ! head.length && ! body.length && ! foot.length;
 		const Section = this.renderSection;
 
@@ -450,7 +464,7 @@ export default class TableEdit extends Component {
 								type="number"
 								className="block-library-table__dimensions__width"
 								label={ widthUnit ? `${ __( 'Width' ) } (${ widthUnit })` : __( 'Width' ) }
-								value={ width !== undefined ? width : '' }
+								value={ getStyleValue( width ) }
 								min={ 1 }
 								onChange={ this.onChangeWidth }
 							/>
@@ -474,7 +488,7 @@ export default class TableEdit extends Component {
 							type="number"
 							className="block-library-table__dimensions__height"
 							label={ __( 'Height (px)' ) }
-							value={ height !== undefined ? height : '' }
+							value={ getStyleValue( height ) }
 							min={ 1 }
 							onChange={ this.onChangeHeight }
 						/>

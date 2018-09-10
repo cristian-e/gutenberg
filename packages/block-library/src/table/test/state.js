@@ -13,8 +13,8 @@ import {
 	deleteRow,
 	insertColumn,
 	deleteColumn,
-	getWidthStyle,
-	getHeightStyle,
+	getStyleValue,
+	getStyleUnit,
 	getTableStyles,
 } from '../state';
 
@@ -290,78 +290,51 @@ describe( 'deleteColumn', () => {
 	} );
 } );
 
-describe( 'getWidthStyle', () => {
-	it( 'returns an object with a width property calculated by appending the widthUnit to the width', () => {
-		const attributes = {
-			width: 52,
-			widthUnit: 'anythings',
-		};
-		expect( getWidthStyle( attributes ).width ).toBe( '52anythings' );
+describe( 'getStyleValue', () => {
+	it( 'returns 50 for a style value with the numerical value of 50', () => {
+		expect( getStyleValue( '50%' ) ).toBe( 50 );
+		expect( getStyleValue( '50px' ) ).toBe( 50 );
+		expect( getStyleValue( 50 ) ).toBe( 50 );
 	} );
 
-	it( 'returns an object with a width property that has a minimum value of 0', () => {
-		const attributes = {
-			width: -5,
-			widthUnit: 'foos',
-		};
-		expect( getWidthStyle( attributes ).width ).toBe( '0foos' );
-	} );
-
-	it( 'returns undefined if the width is not set', () => {
-		const attributes = {
-			width: undefined,
-			widthUnit: 'anythings',
-		};
-		expect( getWidthStyle( attributes ) ).toBeUndefined();
+	it( 'returns undefined when unable to find a numerical value', () => {
+		expect( getStyleValue() ).toBeUndefined();
+		expect( getStyleValue( '' ) ).toBeUndefined();
+		expect( getStyleValue( 'px' ) ).toBeUndefined();
+		expect( getStyleValue( null ) ).toBeUndefined();
 	} );
 } );
 
-describe( 'getHeightStyle', () => {
-	it( 'returns an object with a height property calculated by appending px to the height attribute', () => {
-		const attributes = {
-			height: 13,
-		};
-		expect( getHeightStyle( attributes ).height ).toBe( '13px' );
+describe( 'getStyleUnit', () => {
+	it( 'returns % for a style value with the % suffix', () => {
+		expect( getStyleUnit( '50%' ) ).toBe( '%' );
 	} );
 
-	it( 'returns an object with a height property that has a minimum value of 0', () => {
-		const attributes = {
-			height: -5,
-		};
-		expect( getHeightStyle( attributes ).height ).toBe( '0px' );
+	it( 'returns px for a style value with the px suffix', () => {
+		expect( getStyleUnit( '50px' ) ).toBe( 'px' );
 	} );
 
-	it( 'returns undefined if the height is not set', () => {
-		const attributes = {
-			height: undefined,
-		};
-		expect( getHeightStyle( attributes ) ).toBeUndefined();
+	it( 'returns px for a style value with the PX suffix (case insensitivity)', () => {
+		expect( getStyleUnit( '50PX' ) ).toBe( 'px' );
+	} );
+
+	it( 'returns undefined when unable to find a px or % value', () => {
+		expect( getStyleUnit( '50' ) ).toBeUndefined();
+		expect( getStyleUnit( '' ) ).toBeUndefined();
+		expect( getStyleUnit( 50 ) ).toBeUndefined();
+		expect( getStyleUnit( null ) ).toBeUndefined();
+		expect( getStyleUnit() ).toBeUndefined();
 	} );
 } );
 
 describe( 'getTableStyles', () => {
-	it( 'returns undefined if the height and width attributes are undefined', () => {
-		const attributes = {};
-		expect( getTableStyles( attributes ) ).toBeUndefined();
+	it( 'returns undefined when height and width are falsey values', () => {
+		expect( getTableStyles( {} ) ).toBeUndefined();
+		expect( getTableStyles( { width: '', height: '' } ) ).toBeUndefined();
 	} );
 
-	it( 'returns the width as determined by #getWidthStyle', () => {
-		const attributes = {
-			width: 10,
-			widthUnit: 'bananas',
-			height: 200,
-		};
-		const expectedWidthStyles = getWidthStyle( attributes );
-		expect( getTableStyles( attributes ) ).toMatchObject( expectedWidthStyles );
-	} );
-
-	it( 'returns the height as determined by #getHeightStyle', () => {
-		const attributes = {
-			width: 10,
-			widthUnit: 'bananas',
-			height: 200,
-		};
-		const expectedHeightStyles = getHeightStyle( attributes );
-		expect( getTableStyles( attributes ) ).toMatchObject( expectedHeightStyles );
+	it( 'returns the width and height attributes in an object when defined', () => {
+		const attributes = { width: '50%', height: '200px', somethingElse: 'ignored' };
+		expect( getTableStyles( attributes ) ).toEqual( { width: '50%', height: '200px' } );
 	} );
 } );
