@@ -13,6 +13,8 @@ import {
 	deleteRow,
 	insertColumn,
 	deleteColumn,
+	getWidthStyle,
+	getHeightStyle,
 	getTableStyles,
 } from '../state';
 
@@ -286,38 +288,80 @@ describe( 'deleteColumn', () => {
 
 		expect( state ).toEqual( expected );
 	} );
+} );
 
-	describe( 'getTableStyles', () => {
-		it( 'returns an empty object if the height and width attributes are undefined', () => {
-			const attributes = {};
-			expect( getTableStyles( attributes ) ).toEqual( {} );
-		} );
+describe( 'getWidthStyle', () => {
+	it( 'returns an object with a width property calculated by appending the widthUnit to the width', () => {
+		const attributes = {
+			width: 52,
+			widthUnit: 'anythings',
+		};
+		expect( getWidthStyle( attributes ).width ).toBe( '52anythings' );
+	} );
 
-		it( 'returns a width value by concatenating the width and widthUnit attributes', () => {
-			const attributes = {
-				width: 52,
-				widthUnit: 'anythings',
-			};
-			expect( getTableStyles( attributes ).width ).toBe( '52anythings' );
-		} );
+	it( 'returns an object with a width property that has a minimum value of 0', () => {
+		const attributes = {
+			width: -5,
+			widthUnit: 'foos',
+		};
+		expect( getWidthStyle( attributes ).width ).toBe( '0foos' );
+	} );
 
-		it( 'returns a height style by appending px to the end of the height attribute', () => {
-			const attributes = {
-				height: 40,
-			};
-			expect( getTableStyles( attributes ).height ).toBe( '40px' );
-		} );
+	it( 'returns undefined if the width is not set', () => {
+		const attributes = {
+			width: undefined,
+			widthUnit: 'anythings',
+		};
+		expect( getWidthStyle( attributes ) ).toBeUndefined();
+	} );
+} );
 
-		it( 'returns a height or width of zero if the attributes are negative', () => {
-			const attributes = {
-				width: -20,
-				widthUnit: 'px',
-				height: -10,
-			};
-			expect( getTableStyles( attributes ) ).toEqual( {
-				width: '0px',
-				height: '0px',
-			} );
-		} );
+describe( 'getHeightStyle', () => {
+	it( 'returns an object with a height property calculated by appending px to the height attribute', () => {
+		const attributes = {
+			height: 13,
+		};
+		expect( getHeightStyle( attributes ).height ).toBe( '13px' );
+	} );
+
+	it( 'returns an object with a height property that has a minimum value of 0', () => {
+		const attributes = {
+			height: -5,
+		};
+		expect( getHeightStyle( attributes ).height ).toBe( '0px' );
+	} );
+
+	it( 'returns undefined if the height is not set', () => {
+		const attributes = {
+			height: undefined,
+		};
+		expect( getHeightStyle( attributes ) ).toBeUndefined();
+	} );
+} );
+
+describe( 'getTableStyles', () => {
+	it( 'returns undefined if the height and width attributes are undefined', () => {
+		const attributes = {};
+		expect( getTableStyles( attributes ) ).toBeUndefined();
+	} );
+
+	it( 'returns the width as determined by #getWidthStyle', () => {
+		const attributes = {
+			width: 10,
+			widthUnit: 'bananas',
+			height: 200,
+		};
+		const expectedWidthStyles = getWidthStyle( attributes );
+		expect( getTableStyles( attributes ) ).toMatchObject( expectedWidthStyles );
+	} );
+
+	it( 'returns the height as determined by #getHeightStyle', () => {
+		const attributes = {
+			width: 10,
+			widthUnit: 'bananas',
+			height: 200,
+		};
+		const expectedHeightStyles = getHeightStyle( attributes );
+		expect( getTableStyles( attributes ) ).toMatchObject( expectedHeightStyles );
 	} );
 } );

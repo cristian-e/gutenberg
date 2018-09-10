@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { times, isNumber } from 'lodash';
+import { times, isNumber, isEmpty } from 'lodash';
 
 /**
  * Creates a table state.
@@ -159,20 +159,52 @@ export function deleteColumn( state, {
 }
 
 /**
- * Get the styles for the table
+ * Get the styles for the table's width.
  *
- * @param {number} width The width of the table.
- * @param {string} widthUnit The unit used for the width of the table (px, %).
- * @param {number} height The height of the table.
+ * @param {number} attributes.width     The width of the table.
+ * @param {string} attributes.widthUnit The unit used for the width of the table (px, %).
+ *
+ * @return {Object} Style properties for the table's width.
+ */
+export function getWidthStyle( { width, widthUnit } ) {
+	if ( ! isNumber( width ) ) {
+		return;
+	}
+
+	return { width: `${ Math.max( width, 0 ) }${ widthUnit }` };
+}
+
+/**
+ * Get the styles for the table's height.
+ *
+ * @param {number} attributes.height The height of the table.
+ *
+ * @return {Object} Style properties for the table's height.
+ */
+export function getHeightStyle( { height } ) {
+	if ( ! isNumber( height ) ) {
+		return;
+	}
+
+	return { height: `${ Math.max( height, 0 ) }px` };
+}
+
+/**
+ * Get the styles for the table.
+ *
+ * @param {number} attributes The attributes for the table block
  *
  * @return {Object} Style properties for the table.
  */
-export function getTableStyles( { width, height, widthUnit } ) {
-	const widthValue = isNumber( width ) ? Math.max( width, 0 ) : undefined;
-	const heightValue = isNumber( height ) ? Math.max( height, 0 ) : undefined;
-
-	return {
-		width: isNumber( widthValue ) ? `${ widthValue }${ widthUnit }` : undefined,
-		height: isNumber( heightValue ) ? `${ heightValue }px` : undefined,
+export function getTableStyles( attributes ) {
+	const styles = {
+		...getWidthStyle( attributes ),
+		...getHeightStyle( attributes ),
 	};
+
+	if ( isEmpty( styles ) ) {
+		return;
+	}
+
+	return styles;
 }
