@@ -1,0 +1,50 @@
+[
+    {
+        "clientId": "_clientId_0",
+        "name": "core/table",
+        "isValid": true,
+        "attributes": {
+            "hasFixedLayout": false,
+            "width": "80px",
+            "height": "300px",
+            "head": [],
+            "body": [
+                {
+                    "cells": [
+                        {
+                            "content": [
+                                "eecweecwecee"
+                            ],
+                            "tag": "td"
+                        },
+                        {
+                            "content": [
+                                "wece"
+                            ],
+                            "tag": "td"
+                        }
+                    ]
+                },
+                {
+                    "cells": [
+                        {
+                            "content": [
+                                "ewcwec"
+                            ],
+                            "tag": "td"
+                        },
+                        {
+                            "content": [
+                                "ecwewecw"
+                            ],
+                            "tag": "td"
+                        }
+                    ]
+                }
+            ],
+            "foot": []
+        },
+        "innerBlocks": [],
+        "originalContent": "<table class=\"wp-block-table\" style=\"width:80px;height:300px\"><tbody><tr><td>eecweecwecee</td><td>wece</td></tr><tr><td>ewcwec</td><td>ecwewecw</td></tr></tbody></table>"
+    }
+]
