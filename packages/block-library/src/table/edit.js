@@ -109,11 +109,21 @@ export default class TableEdit extends Component {
 	/**
 	 * Update the width of the table.
 	 *
-	 * @param {number} updatedWidth The new width of the table.
+	 * @param {number} width The new width of the table.
 	 */
-	onChangeWidth( updatedWidth ) {
-		const width = updatedWidth !== '' ? parseInt( updatedWidth, 10 ) : undefined;
-		this.props.setAttributes( { width } );
+	onChangeWidth( width ) {
+		const attributesUpdate = {
+			width: width !== '' ? parseInt( width, 10 ) : undefined,
+		};
+
+		// Guard against the possibility of the width being set with an undefined widthUnit.
+		// This can happen if the user added a deprecated table block from before the width
+		// and widthUnit attributes were introduced.
+		if ( ! this.props.attributes.widthUnit ) {
+			attributesUpdate.widthUnit = '%';
+		}
+
+		this.props.setAttributes( attributesUpdate );
 	}
 
 	/**
@@ -439,7 +449,7 @@ export default class TableEdit extends Component {
 							<TextControl
 								type="number"
 								className="block-library-table__dimensions__width"
-								label={ `${ __( 'Width' ) } (${ widthUnit })` }
+								label={ widthUnit ? `${ __( 'Width' ) } (${ widthUnit })` : __( 'Width' ) }
 								value={ width !== undefined ? width : '' }
 								min={ 1 }
 								onChange={ this.onChangeWidth }
