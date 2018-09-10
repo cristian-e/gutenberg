@@ -112,6 +112,8 @@ export function matcherFromSource( sourceConfig ) {
 			return children( sourceConfig.selector );
 		case 'node':
 			return node( sourceConfig.selector );
+		case 'styleProperty':
+			return prop( sourceConfig.selector, `style.${ sourceConfig.styleProperty }` );
 		case 'query':
 			const subMatchers = mapValues( sourceConfig.query, matcherFromSource );
 			return query( sourceConfig.selector, subMatchers );
@@ -164,6 +166,7 @@ export function getBlockAttribute( attributeKey, attributeSchema, innerHTML, com
 		case 'text':
 		case 'children':
 		case 'node':
+		case 'styleProperty':
 		case 'query':
 		case 'tag':
 			value = parseWithAttributeSchema( innerHTML, attributeSchema );

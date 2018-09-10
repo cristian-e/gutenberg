@@ -88,15 +88,17 @@ export const settings = {
 			default: false,
 		},
 		width: {
-			type: 'number',
-			default: 100,
-		},
-		widthUnit: {
 			type: 'string',
-			default: '%',
+			default: '100%',
+			source: 'styleProperty',
+			selector: 'table',
+			styleProperty: 'width',
 		},
 		height: {
-			type: 'number',
+			type: 'string',
+			source: 'styleProperty',
+			selector: 'table',
+			styleProperty: 'height',
 		},
 		head: getTableSectionAttributeSchema( 'head' ),
 		body: getTableSectionAttributeSchema( 'body' ),
