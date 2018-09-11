@@ -113,7 +113,10 @@ export function matcherFromSource( sourceConfig ) {
 		case 'node':
 			return node( sourceConfig.selector );
 		case 'styleProperty':
-			return prop( sourceConfig.selector, `style.${ sourceConfig.styleProperty }` );
+			return flow( [
+				prop( sourceConfig.selector, `style.${ sourceConfig.styleProperty }` ),
+				( value ) => value !== '' ? value : undefined,
+			] );
 		case 'query':
 			const subMatchers = mapValues( sourceConfig.query, matcherFromSource );
 			return query( sourceConfig.selector, subMatchers );
