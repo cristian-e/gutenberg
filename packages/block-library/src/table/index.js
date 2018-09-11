@@ -31,6 +31,7 @@ const tableContentPasteSchema = {
 
 const tablePasteSchema = {
 	table: {
+		attributes: [ 'style' ],
 		children: {
 			thead: {
 				children: tableContentPasteSchema,
