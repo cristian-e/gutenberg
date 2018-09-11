@@ -159,11 +159,11 @@ export function deleteColumn( state, {
 }
 
 /**
- * Get the integer value of a style property
+ * Get the integer value of a style property.
  *
- * @param {string} rawValue The style's raw value (e.g. 100%, 25px)
+ * @param {?string} rawValue The style's raw value (e.g. 100%, 25px).
  *
- * @return {?number} The integer value (e.g. 100, 25)
+ * @return {?number} The integer value (e.g. 100, 25).
  */
 export function getStyleValue( rawValue ) {
 	const parsedValue = parseInt( rawValue, 10 );
@@ -176,11 +176,11 @@ export function getStyleValue( rawValue ) {
 }
 
 /**
- * Get the px or % unit from a style value
+ * Get the px or % unit from a style value.
  *
- * @param {string} value The style's value (e.g. 100px, 25%)
+ * @param {?string} value The style's value (e.g. 100px, 25%).
  *
- * @return {?string} The unit (e.g. px, %)
+ * @return {?string} The unit (e.g. px, %).
  */
 export function getStyleUnit( value ) {
 	const match = /(px|%)/i.exec( value );
@@ -193,12 +193,12 @@ export function getStyleUnit( value ) {
 }
 
 /**
- * Given the table block attributes, return the style properties
+ * Given the table block attributes, return the style properties.
  *
- * @param {string} attributes.width  The width value
- * @param {string} attributes.height The height value
+ * @param {?string} attributes.width  The width value.
+ * @param {?string} attributes.height The height value.
  *
- * @return {?Object} The style properties
+ * @return {?Object} The style properties.
  */
 export function getTableStyles( { width, height } ) {
 	if ( ! width && ! height ) {
