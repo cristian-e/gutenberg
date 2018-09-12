@@ -8,7 +8,7 @@ import classnames from 'classnames';
  */
 import { Fragment, Component } from '@wordpress/element';
 import { InspectorControls, BlockControls, RichText } from '@wordpress/editor';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import {
 	PanelBody,
 	ToggleControl,
@@ -446,6 +446,9 @@ export default class TableEdit extends Component {
 			'has-fixed-layout': hasFixedLayout,
 		} );
 
+		// translators: %s: a unit of measurement for CSS (e.g. 'px' or '%')
+		const widthLabel = widthUnit ? sprintf( __( 'Width (%s)' ), widthUnit ) : __( 'Width' );
+
 		return (
 			<Fragment>
 				<BlockControls>
@@ -463,7 +466,7 @@ export default class TableEdit extends Component {
 							<TextControl
 								type="number"
 								className="block-library-table__dimensions__width"
-								label={ widthUnit ? `${ __( 'Width' ) } (${ widthUnit })` : __( 'Width' ) }
+								label={ widthLabel }
 								value={ getStyleValue( width ) }
 								min={ 1 }
 								onChange={ this.onChangeWidth }
